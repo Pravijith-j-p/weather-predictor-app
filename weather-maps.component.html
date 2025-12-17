@@ -1,0 +1,224 @@
+<div class="weather-maps-container">
+  <header class="page-header">
+    <nav class="breadcrumb">
+      <a routerLink="/dashboard">← Dashboard</a>
+    </nav>
+    <div class="header-content">
+      <h1>Weather Maps</h1>
+      <button class="refresh-btn" (click)="refreshMap()" title="Refresh map data">
+        🔄
+      </button>
+    </div>
+    <p class="subtitle">Interactive weather visualization and satellite imagery</p>
+  </header>
+
+  <div class="maps-content">
+    <!-- Map Controls -->
+    <div class="controls-section">
+      <!-- Layer Selection -->
+      <div class="layer-controls">
+        <h3>🗺️ Map Layers</h3>
+        <div class="layer-buttons">
+          <button 
+            *ngFor="let layer of mapLayers" 
+            class="layer-btn"
+            [class.active]="selectedLayer === layer.id"
+            (click)="selectLayer(layer.id)"
+            [style.border-color]="layer.color"
+          >
+            <span class="layer-icon">{{ layer.icon }}</span>
+            <span class="layer-name">{{ layer.name }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Current Layer Info -->
+      <div class="layer-info">
+        <div class="info-header">
+          <span class="info-icon">{{ getSelectedLayer().icon }}</span>
+          <h4>{{ getSelectedLayer().name }}</h4>
+        </div>
+        <p class="info-description">{{ getSelectedLayer().description }}</p>
+        <p class="info-details">{{ getLayerInfo() }}</p>
+      </div>
+
+      <!-- Zoom Controls -->
+      <div class="zoom-controls">
+        <h4>🔍 Zoom Level: {{ mapZoom }}</h4>
+        <div class="zoom-buttons">
+          <button class="zoom-btn" (click)="zoomOut()" [disabled]="mapZoom <= 1">
+            ➖ Zoom Out
+          </button>
+          <button class="zoom-btn" (click)="zoomIn()" [disabled]="mapZoom >= 10">
+            ➕ Zoom In
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Display -->
+    <div class="map-section">
+      <div class="map-container">
+        <div class="map-placeholder">
+          <div class="map-overlay">
+            <div class="overlay-content">
+              <div class="map-icon">🗺️</div>
+              <h3>Weather Map Visualization</h3>
+              <p><strong>Current Layer:</strong> {{ getSelectedLayer().name }}</p>
+              <p><strong>Zoom Level:</strong> {{ mapZoom }}</p>
+              <div class="demo-notice">
+                <h4>🚧 Demo Mode</h4>
+                <p>This is a demonstration of the weather maps interface. In a production environment, this would display:</p>
+                <ul>
+                  <li>Real-time weather data overlays</li>
+                  <li>Interactive map controls</li>
+                  <li>Satellite imagery</li>
+                  <li>Animation controls for time-lapse</li>
+                  <li>Custom location markers</li>
+                </ul>
+                <p class="api-note">
+                  <strong>To enable:</strong> Add your OpenWeatherMap API key to the weather service 
+                  and integrate with a mapping library like Leaflet or Google Maps.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Navigation -->
+      <div class="map-navigation">
+        <h4>📍 Quick Navigation</h4>
+        <div class="nav-buttons">
+          <button 
+            *ngFor="let location of predefinedLocations" 
+            class="nav-btn"
+            (click)="jumpToLocation(location)"
+          >
+            {{ location.name }}
+          </button>
+          <button 
+            class="nav-btn current-location-btn"
+            (click)="centerOnCurrentLocation()"
+            *ngIf="currentLocation"
+          >
+            📍 {{ currentLocation.name }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer Legend -->
+    <div class="legend-section">
+      <h3>🎨 Layer Information</h3>
+      <div class="legend-grid">
+        <div 
+          *ngFor="let layer of mapLayers" 
+          class="legend-item"
+          [class.active]="selectedLayer === layer.id"
+          (click)="selectLayer(layer.id)"
+        >
+          <div class="legend-color" [style.background-color]="layer.color"></div>
+          <div class="legend-info">
+            <div class="legend-title">
+              <span class="legend-icon">{{ layer.icon }}</span>
+              {{ layer.name }}
+            </div>
+            <div class="legend-desc">{{ layer.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map Features -->
+    <div class="features-section">
+      <h3>✨ Available Features</h3>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⏰</div>
+          <div class="feature-content">
+            <h4>Real-time Updates</h4>
+            <p>Weather data refreshes automatically every 15 minutes</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🎬</div>
+          <div class="feature-content">
+            <h4>Animation Controls</h4>
+            <p>View weather patterns over time with animated overlays</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <div class="feature-content">
+            <h4>Multiple Layers</h4>
+            <p>Switch between temperature, precipitation, wind, and more</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <div class="feature-content">
+            <h4>Mobile Optimized</h4>
+            <p>Touch-friendly controls for mobile and tablet devices</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <div class="feature-content">
+            <h4>Live Sync</h4>
+            <p>Synchronized with current location from other pages</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <div class="feature-content">
+            <h4>Save Views</h4>
+            <p>Bookmark favorite map views and layer combinations</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Integration Info -->
+    <div class="integration-info">
+      <h3>🔧 Implementation Details</h3>
+      <div class="info-cards">
+        <div class="info-card">
+          <h4>🌐 API Integration</h4>
+          <p><strong>OpenWeatherMap API:</strong> Provides weather tile layers and data overlays</p>
+          <p><strong>Map Tiles:</strong> temp_new, precipitation_new, clouds_new, wind_new, pressure_new</p>
+        </div>
+
+        <div class="info-card">
+          <h4>🗺️ Mapping Libraries</h4>
+          <p><strong>Recommended:</strong> Leaflet.js for lightweight mapping or Google Maps for full features</p>
+          <p><strong>Tile Support:</strong> Compatible with standard XYZ tile format</p>
+        </div>
+
+        <div class="info-card">
+          <h4>📊 Data Visualization</h4>
+          <p><strong>Color Scales:</strong> Customizable gradients for each weather parameter</p>
+          <p><strong>Opacity Control:</strong> Adjustable transparency for layer blending</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <a routerLink="/current-weather" class="action-btn current-btn">
+      🌤️ Current Weather
+    </a>
+    <a routerLink="/forecast" class="action-btn forecast-btn">
+      📊 5-Day Forecast
+    </a>
+    <a routerLink="/location-search" class="action-btn search-btn">
+      🔍 Location Search
+    </a>
+  </div>
+</div>

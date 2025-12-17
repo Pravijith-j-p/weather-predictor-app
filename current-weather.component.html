@@ -1,0 +1,190 @@
+<div class="current-weather-container">
+  <header class="page-header">
+    <nav class="breadcrumb">
+      <a routerLink="/dashboard">← Dashboard</a>
+    </nav>
+    <h1>Current Weather</h1>
+  </header>
+
+  <!-- Location Search -->
+  <div class="search-section">
+    <div class="search-container">
+      <div class="search-input-group">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          placeholder="Search for a city..."
+          class="search-input"
+        >
+        <button *ngIf="searchQuery" (click)="clearSearch()" class="clear-btn">×</button>
+        <button (click)="useCurrentLocation()" class="location-btn" title="Use current location">
+          📍
+        </button>
+      </div>
+
+      <!-- Search Results -->
+      <div *ngIf="showSearchResults && searchResults.length > 0" class="search-results">
+        <div 
+          *ngFor="let result of searchResults" 
+          class="search-result-item"
+          (click)="selectLocation(result)"
+        >
+          <div class="result-name">{{ result.display_name.split(',')[0] }}</div>
+          <div class="result-details">{{ result.display_name.split(',').slice(1, 3).join(',') }}</div>
+        </div>
+      </div>
+
+      <div *ngIf="searching" class="search-loading">
+        <div class="spinner-small"></div>
+        Searching...
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading current weather...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <h3>⚠️ Unable to Load Weather</h3>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="refreshWeather()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Weather Content -->
+  <div *ngIf="!loading && !error && currentWeather" class="weather-content">
+    <!-- Main Weather Display -->
+    <div class="main-weather-card">
+      <div class="weather-header">
+        <div class="location-info">
+          <h2>{{ currentLocation?.name || currentWeather.name }}</h2>
+          <p class="coordinates">{{ currentWeather.coord.lat | number:'1.4-4' }}, {{ currentWeather.coord.lon | number:'1.4-4' }}</p>
+        </div>
+        <button class="refresh-btn" (click)="refreshWeather()" title="Refresh weather">
+          🔄
+        </button>
+      </div>
+
+      <div class="current-conditions">
+        <div class="weather-display">
+          <img 
+            [src]="getWeatherIconUrl(currentWeather.weather[0].icon)" 
+            [alt]="currentWeather.weather[0].description"
+            class="weather-icon"
+          >
+          <div class="temperature-info">
+            <div class="main-temp">{{ currentWeather.main.temp | number:'1.0-0' }}<span class="unit">°C</span></div>
+            <div class="feels-like">Feels like {{ currentWeather.main.feels_like | number:'1.0-0' }}°C</div>
+            <div class="temp-range">
+              H: {{ currentWeather.main.temp_max | number:'1.0-0' }}° 
+              L: {{ currentWeather.main.temp_min | number:'1.0-0' }}°
+            </div>
+          </div>
+        </div>
+
+        <div class="condition-details">
+          <h3>{{ currentWeather.weather[0].main }}</h3>
+          <p>{{ currentWeather.weather[0].description | titlecase }}</p>
+          <div class="last-updated">
+            Updated: {{ currentWeather.dt * 1000 | date:'short' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detailed Weather Information -->
+    <div class="details-grid">
+      <!-- Atmospheric Conditions -->
+      <div class="detail-card">
+        <h4>💨 Atmospheric Conditions</h4>
+        <div class="detail-items">
+          <div class="detail-row">
+            <span class="detail-label">Humidity</span>
+            <span class="detail-value">{{ currentWeather.main.humidity }}%</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Pressure</span>
+            <span class="detail-value">{{ currentWeather.main.pressure }} hPa</span>
+          </div>
+          <div class="detail-row" *ngIf="currentWeather.main.sea_level">
+            <span class="detail-label">Sea Level</span>
+            <span class="detail-value">{{ currentWeather.main.sea_level }} hPa</span>
+          </div>
+          <div class="detail-row" *ngIf="currentWeather.main.grnd_level">
+            <span class="detail-label">Ground Level</span>
+            <span class="detail-value">{{ currentWeather.main.grnd_level }} hPa</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wind Information -->
+      <div class="detail-card">
+        <h4>🌪️ Wind Information</h4>
+        <div class="detail-items">
+          <div class="detail-row">
+            <span class="detail-label">Speed</span>
+            <span class="detail-value">{{ currentWeather.wind.speed }} m/s</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Direction</span>
+            <span class="detail-value">{{ getWindDirection(currentWeather.wind.deg) }} ({{ currentWeather.wind.deg }}°)</span>
+          </div>
+          <div class="detail-row" *ngIf="currentWeather.wind.gust">
+            <span class="detail-label">Gust</span>
+            <span class="detail-value">{{ currentWeather.wind.gust }} m/s</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visibility & Clouds -->
+      <div class="detail-card">
+        <h4>☁️ Visibility & Clouds</h4>
+        <div class="detail-items">
+          <div class="detail-row">
+            <span class="detail-label">Cloud Cover</span>
+            <span class="detail-value">{{ currentWeather.clouds.all }}%</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Weather ID</span>
+            <span class="detail-value">{{ currentWeather.weather[0].id }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sun Times -->
+      <div class="detail-card">
+        <h4>☀️ Sun Times</h4>
+        <div class="detail-items">
+          <div class="detail-row">
+            <span class="detail-label">Sunrise</span>
+            <span class="detail-value">{{ formatTime(currentWeather.sys.sunrise) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Sunset</span>
+            <span class="detail-value">{{ formatTime(currentWeather.sys.sunset) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Country</span>
+            <span class="detail-value">{{ currentWeather.sys.country }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <a routerLink="/forecast" class="action-btn forecast-btn">
+        📊 View 5-Day Forecast
+      </a>
+      <a routerLink="/weather-maps" class="action-btn maps-btn">
+        🗺️ View Weather Maps
+      </a>
+    </div>
+  </div>
+</div>

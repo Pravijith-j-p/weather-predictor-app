@@ -1,0 +1,125 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>Weather Predictor</h1>
+    <p class="subtitle">Your comprehensive weather companion</p>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading weather data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <h3>⚠️ Weather Unavailable</h3>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="refreshWeather()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error && currentWeather" class="dashboard-content">
+    <!-- Current Weather Card -->
+    <div class="current-weather-card">
+      <div class="weather-header">
+        <h2>{{ currentLocation?.name || currentWeather.name }}</h2>
+        <button class="refresh-btn" (click)="refreshWeather()" title="Refresh weather">
+          🔄
+        </button>
+      </div>
+      
+      <div class="weather-main">
+        <div class="weather-icon">
+          <img [src]="getWeatherIconUrl(currentWeather.weather[0].icon)" 
+               [alt]="currentWeather.weather[0].description">
+        </div>
+        <div class="weather-info">
+          <div class="temperature">{{ currentWeather.main.temp | number:'1.0-0' }}°C</div>
+          <div class="description">{{ currentWeather.weather[0].description | titlecase }}</div>
+          <div class="feels-like">Feels like {{ currentWeather.main.feels_like | number:'1.0-0' }}°C</div>
+        </div>
+      </div>
+
+      <div class="weather-details">
+        <div class="detail-item">
+          <span class="label">Humidity</span>
+          <span class="value">{{ currentWeather.main.humidity }}%</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Wind</span>
+          <span class="value">{{ currentWeather.wind.speed }} m/s</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Pressure</span>
+          <span class="value">{{ currentWeather.main.pressure }} hPa</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Clouds</span>
+          <span class="value">{{ currentWeather.clouds.all }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="quick-nav">
+      <h3>Explore Weather Features</h3>
+      <div class="nav-cards">
+        <a routerLink="/current-weather" class="nav-card">
+          <div class="nav-icon">🌤️</div>
+          <h4>Current Weather</h4>
+          <p>Detailed current conditions and hourly updates</p>
+        </a>
+
+        <a routerLink="/forecast" class="nav-card">
+          <div class="nav-icon">📊</div>
+          <h4>5-Day Forecast</h4>
+          <p>Extended forecast with charts and analytics</p>
+        </a>
+
+        <a routerLink="/location-search" class="nav-card">
+          <div class="nav-icon">🔍</div>
+          <h4>Location Search</h4>
+          <p>Search weather for any location worldwide</p>
+        </a>
+
+        <a routerLink="/weather-maps" class="nav-card">
+          <div class="nav-icon">🗺️</div>
+          <h4>Weather Maps</h4>
+          <p>Interactive weather maps and satellite imagery</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Weather Summary -->
+    <div class="weather-summary">
+      <h3>Today's Summary</h3>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-label">High / Low</div>
+          <div class="summary-value">
+            {{ currentWeather.main.temp_max | number:'1.0-0' }}° / 
+            {{ currentWeather.main.temp_min | number:'1.0-0' }}°
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Sunrise</div>
+          <div class="summary-value">
+            {{ currentWeather.sys.sunrise * 1000 | date:'shortTime' }}
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Sunset</div>
+          <div class="summary-value">
+            {{ currentWeather.sys.sunset * 1000 | date:'shortTime' }}
+          </div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Conditions</div>
+          <div class="summary-value">{{ currentWeather.weather[0].main }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

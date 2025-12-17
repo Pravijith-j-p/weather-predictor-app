@@ -1,0 +1,187 @@
+<div class="location-search-container">
+  <header class="page-header">
+    <nav class="breadcrumb">
+      <a routerLink="/dashboard">← Dashboard</a>
+    </nav>
+    <h1>Location Search</h1>
+    <p class="subtitle">Find weather for any location worldwide</p>
+  </header>
+
+  <!-- Current Location Section -->
+  <div class="current-location-section" *ngIf="currentLocation">
+    <div class="current-location-card">
+      <div class="location-info">
+        <h3>📍 Current Location</h3>
+        <p class="location-name">{{ currentLocation.name }}</p>
+        <p class="coordinates">{{ currentLocation.lat | number:'1.4-4' }}, {{ currentLocation.lon | number:'1.4-4' }}</p>
+        <p class="country" *ngIf="currentLocation.country">{{ currentLocation.country }}</p>
+      </div>
+      <div class="location-actions">
+        <button class="save-btn" (click)="saveCurrentLocation()">
+          ⭐ Save Location
+        </button>
+        <a routerLink="/current-weather" class="view-weather-btn">
+          🌤️ View Weather
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-container">
+      <h3>🔍 Search Locations</h3>
+      <div class="search-input-group">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          placeholder="Search for cities, countries, or addresses..."
+          class="search-input"
+        >
+        <button *ngIf="searchQuery" (click)="clearSearch()" class="clear-btn">×</button>
+        <button (click)="useCurrentLocation()" class="location-btn" title="Use current location">
+          📍
+        </button>
+      </div>
+
+      <!-- Search Results -->
+      <div *ngIf="showSearchResults && searchResults.length > 0" class="search-results">
+        <div 
+          *ngFor="let result of searchResults" 
+          class="search-result-item"
+          (click)="selectLocation(result)"
+        >
+          <div class="result-main">
+            <div class="result-name">{{ result.display_name.split(',')[0] }}</div>
+            <div class="result-type">{{ result.type | titlecase }}</div>
+          </div>
+          <div class="result-details">{{ result.display_name.split(',').slice(1, 3).join(',') }}</div>
+          <div class="result-coordinates">{{ result.lat | number:'1.2-2' }}, {{ result.lon | number:'1.2-2' }}</div>
+        </div>
+      </div>
+
+      <div *ngIf="showSearchResults && searchResults.length === 0 && !searching" class="no-results">
+        <p>No locations found for "{{ searchQuery }}"</p>
+        <small>Try searching with different terms or check spelling</small>
+      </div>
+
+      <div *ngIf="searching" class="search-loading">
+        <div class="spinner-small"></div>
+        Searching locations...
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Cities -->
+  <div class="popular-cities-section">
+    <h3>🌍 Popular Cities</h3>
+    <div class="city-grid">
+      <div 
+        *ngFor="let city of popularCities" 
+        class="city-card"
+        (click)="selectPopularCity(city)"
+      >
+        <div class="city-name">{{ city.name }}</div>
+        <div class="city-country">{{ city.country }}</div>
+        <div class="city-coordinates">{{ city.lat | number:'1.1-1' }}, {{ city.lon | number:'1.1-1' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Searches -->
+  <div class="recent-searches-section" *ngIf="recentSearches.length > 0">
+    <h3>🕒 Recent Searches</h3>
+    <div class="recent-list">
+      <div 
+        *ngFor="let search of recentSearches" 
+        class="recent-item"
+        (click)="selectLocation(search)"
+      >
+        <div class="recent-main">
+          <div class="recent-name">{{ search.display_name.split(',')[0] }}</div>
+          <div class="recent-details">{{ search.display_name.split(',').slice(1, 2).join(',') }}</div>
+        </div>
+        <div class="recent-type">{{ search.type | titlecase }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved Locations -->
+  <div class="saved-locations-section" *ngIf="savedLocations.length > 0">
+    <h3>⭐ Saved Locations</h3>
+    <div class="saved-grid">
+      <div 
+        *ngFor="let location of savedLocations" 
+        class="saved-location-card"
+      >
+        <div class="saved-header">
+          <div class="saved-name">{{ location.name }}</div>
+          <button class="remove-btn" (click)="removeSavedLocation(location.id)" title="Remove">
+            ×
+          </button>
+        </div>
+        <div class="saved-details">
+          <div class="saved-coordinates">{{ location.lat | number:'1.2-2' }}, {{ location.lon | number:'1.2-2' }}</div>
+          <div class="saved-date">Saved {{ formatSavedDate(location.savedAt) }}</div>
+        </div>
+        <div class="saved-actions">
+          <button class="select-btn" (click)="selectSavedLocation(location)">
+            📍 Select
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tips Section -->
+  <div class="tips-section">
+    <h3>💡 Search Tips</h3>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-icon">🏙️</div>
+        <div class="tip-content">
+          <h4>City Names</h4>
+          <p>Search by city name: "New York", "London", "Tokyo"</p>
+        </div>
+      </div>
+      
+      <div class="tip-card">
+        <div class="tip-icon">🗺️</div>
+        <div class="tip-content">
+          <h4>Countries & Regions</h4>
+          <p>Include country for better results: "Paris, France"</p>
+        </div>
+      </div>
+      
+      <div class="tip-card">
+        <div class="tip-icon">📍</div>
+        <div class="tip-content">
+          <h4>Specific Addresses</h4>
+          <p>Search specific addresses for precise locations</p>
+        </div>
+      </div>
+      
+      <div class="tip-card">
+        <div class="tip-icon">🌐</div>
+        <div class="tip-content">
+          <h4>GPS Coordinates</h4>
+          <p>Use "Current Location" for GPS-based weather</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <a routerLink="/current-weather" class="action-btn weather-btn">
+      🌤️ Current Weather
+    </a>
+    <a routerLink="/forecast" class="action-btn forecast-btn">
+      📊 5-Day Forecast
+    </a>
+    <a routerLink="/weather-maps" class="action-btn maps-btn">
+      🗺️ Weather Maps
+    </a>
+  </div>
+</div>

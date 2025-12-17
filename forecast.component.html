@@ -1,0 +1,186 @@
+<div class="forecast-container">
+  <header class="page-header">
+    <nav class="breadcrumb">
+      <a routerLink="/dashboard">← Dashboard</a>
+    </nav>
+    <div class="header-content">
+      <h1>5-Day Weather Forecast</h1>
+      <button *ngIf="currentLocation" class="refresh-btn" (click)="refreshForecast()" title="Refresh forecast">
+        🔄
+      </button>
+    </div>
+    <p *ngIf="currentLocation" class="location-name">{{ currentLocation.name }}</p>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading forecast data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="error-message">
+      <h3>⚠️ Unable to Load Forecast</h3>
+      <p>{{ error }}</p>
+      <button class="retry-btn" (click)="refreshForecast()">Try Again</button>
+    </div>
+  </div>
+
+  <!-- Forecast Content -->
+  <div *ngIf="!loading && !error && forecastData" class="forecast-content">
+    
+    <!-- Daily Overview -->
+    <div class="daily-overview">
+      <h3>5-Day Overview</h3>
+      <div class="daily-cards">
+        <div 
+          *ngFor="let day of dailyForecasts" 
+          class="daily-card"
+          [class.selected]="selectedDay?.date === day.date"
+          (click)="selectDay(day)"
+        >
+          <div class="day-name">{{ getDayName(day.dateObj) }}</div>
+          <div class="day-date">{{ day.dateObj | date:'MMM d' }}</div>
+          <img 
+            [src]="getWeatherIconUrl(day.mainCondition.icon)" 
+            [alt]="day.mainCondition.description"
+            class="day-icon"
+          >
+          <div class="day-temps">
+            <span class="high">{{ day.maxTemp | number:'1.0-0' }}°</span>
+            <span class="low">{{ day.minTemp | number:'1.0-0' }}°</span>
+          </div>
+          <div class="day-condition">{{ day.mainCondition.main }}</div>
+          <div class="precipitation" *ngIf="day.precipitationProb > 0">
+            💧 {{ day.precipitationProb | number:'1.0-0' }}%
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="chart-container">
+        <canvas #tempChart></canvas>
+      </div>
+      <div class="chart-container">
+        <canvas #humidityChart></canvas>
+      </div>
+    </div>
+
+    <!-- Detailed Day View -->
+    <div *ngIf="selectedDay" class="detailed-day-view">
+      <h3>{{ getDayName(selectedDay.dateObj) }} - {{ selectedDay.dateObj | date:'fullDate' }}</h3>
+      
+      <div class="day-summary">
+        <div class="summary-main">
+          <img 
+            [src]="getWeatherIconUrl(selectedDay.mainCondition.icon)" 
+            [alt]="selectedDay.mainCondition.description"
+            class="large-icon"
+          >
+          <div class="summary-info">
+            <h4>{{ selectedDay.mainCondition.main }}</h4>
+            <p>{{ selectedDay.mainCondition.description | titlecase }}</p>
+            <div class="temp-range">
+              High: {{ selectedDay.maxTemp | number:'1.0-0' }}°C | 
+              Low: {{ selectedDay.minTemp | number:'1.0-0' }}°C
+            </div>
+          </div>
+        </div>
+        
+        <div class="summary-stats">
+          <div class="stat-item">
+            <span class="stat-label">💧 Humidity</span>
+            <span class="stat-value">{{ selectedDay.avgHumidity }}%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">🌬️ Wind Speed</span>
+            <span class="stat-value">{{ selectedDay.avgWindSpeed | number:'1.1-1' }} m/s</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">🔽 Pressure</span>
+            <span class="stat-value">{{ selectedDay.avgPressure }} hPa</span>
+          </div>
+          <div class="stat-item" *ngIf="selectedDay.precipitationProb > 0">
+            <span class="stat-label">☔ Rain Chance</span>
+            <span class="stat-value">{{ selectedDay.precipitationProb | number:'1.0-0' }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hourly Breakdown -->
+      <div class="hourly-breakdown">
+        <h4>Hourly Breakdown</h4>
+        <div class="hourly-items">
+          <div 
+            *ngFor="let item of selectedDay.items" 
+            class="hourly-item"
+          >
+            <div class="hour-time">{{ formatTime(item.dt) }}</div>
+            <img 
+              [src]="getWeatherIconUrl(item.weather[0].icon)" 
+              [alt]="item.weather[0].description"
+              class="hour-icon"
+            >
+            <div class="hour-temp">{{ item.main.temp | number:'1.0-0' }}°</div>
+            <div class="hour-details">
+              <small>{{ item.weather[0].main }}</small>
+              <small *ngIf="item.pop > 0">{{ item.pop * 100 | number:'1.0-0' }}% rain</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weather Insights -->
+    <div class="weather-insights">
+      <h3>Weather Insights</h3>
+      <div class="insight-cards">
+        <div class="insight-card">
+          <h4>🌡️ Temperature Trend</h4>
+          <p>
+            Average temperature over the next 5 days: 
+            <strong>{{ getAverageTemperature() | number:'1.0-0' }}°C</strong>
+          </p>
+        </div>
+        
+        <div class="insight-card">
+          <h4>💧 Humidity Pattern</h4>
+          <p>
+            Expected humidity levels will range from 
+            <strong>{{ getMinHumidity() }}%</strong> to 
+            <strong>{{ getMaxHumidity() }}%</strong>
+          </p>
+        </div>
+        
+        <div class="insight-card">
+          <h4>☔ Precipitation Outlook</h4>
+          <p *ngIf="hasHighRainChance()">
+            High chance of rain expected. Pack an umbrella! ☂️
+          </p>
+          <p *ngIf="hasModerateRainChance()">
+            Moderate chance of light rain. Weather looks mostly clear! 🌤️
+          </p>
+          <p *ngIf="hasClearSkies()">
+            Clear skies ahead! Perfect weather for outdoor activities! ☀️
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <a routerLink="/current-weather" class="action-btn current-btn">
+        🌤️ Current Weather
+      </a>
+      <a routerLink="/location-search" class="action-btn search-btn">
+        🔍 Change Location
+      </a>
+      <a routerLink="/weather-maps" class="action-btn maps-btn">
+        🗺️ Weather Maps
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,477 @@
+.forecast-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+  padding: 2rem 1rem;
+}
+
+.page-header {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  color: white;
+}
+
+.breadcrumb a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+  color: white;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.refresh-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.refresh-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.location-name {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: white;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.retry-btn {
+  background: #00b894;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+  transition: background 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: #00a085;
+}
+
+.forecast-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  gap: 2rem;
+}
+
+.daily-overview {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.daily-overview h3 {
+  color: #2d3436;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+}
+
+.daily-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.daily-card {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.1));
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.daily-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(108, 92, 231, 0.3);
+}
+
+.daily-card.selected {
+  border-color: #6c5ce7;
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.2), rgba(162, 155, 254, 0.2));
+}
+
+.day-name {
+  font-weight: 600;
+  color: #2d3436;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.day-date {
+  color: #636e72;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.day-icon {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 1rem;
+}
+
+.day-temps {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.high {
+  color: #2d3436;
+  font-size: 1.1rem;
+}
+
+.low {
+  color: #636e72;
+  font-size: 1.1rem;
+}
+
+.day-condition {
+  color: #636e72;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.precipitation {
+  color: #00b894;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.chart-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  padding: 1.5rem;
+  height: 350px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.detailed-day-view {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.detailed-day-view h3 {
+  color: #2d3436;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+}
+
+.day-summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.summary-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.large-icon {
+  width: 80px;
+  height: 80px;
+}
+
+.summary-info h4 {
+  color: #2d3436;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+}
+
+.summary-info p {
+  color: #636e72;
+  margin: 0 0 0.75rem 0;
+}
+
+.temp-range {
+  color: #2d3436;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-content: start;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.1));
+  border-radius: 12px;
+}
+
+.stat-label {
+  color: #636e72;
+  font-weight: 500;
+}
+
+.stat-value {
+  color: #2d3436;
+  font-weight: 600;
+}
+
+.hourly-breakdown h4 {
+  color: #2d3436;
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+.hourly-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.hourly-item {
+  background: rgba(108, 92, 231, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid rgba(108, 92, 231, 0.1);
+}
+
+.hour-time {
+  color: #636e72;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.hour-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.5rem;
+}
+
+.hour-temp {
+  color: #2d3436;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.hour-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hour-details small {
+  color: #636e72;
+  font-size: 0.8rem;
+}
+
+.weather-insights {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.weather-insights h3 {
+  color: #2d3436;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+}
+
+.insight-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.insight-card {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(162, 155, 254, 0.1));
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.insight-card h4 {
+  color: #2d3436;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.insight-card p {
+  color: #636e72;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.insight-card strong {
+  color: #2d3436;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.current-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.search-btn {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+}
+
+.maps-btn {
+  background: linear-gradient(135deg, #00b894, #00a085);
+  color: white;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .forecast-container {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+
+  .day-summary {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .summary-main {
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hourly-items {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .quick-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .insight-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .hourly-items {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  }
+}
