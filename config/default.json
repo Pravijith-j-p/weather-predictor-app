@@ -1,0 +1,6 @@
+{
+  "apiKey": "YOUR_API_KEY_HERE",
+  "baseUrl": "https://api.weatherapi.com/v1",
+  "defaultCity": "New York",
+  "units": "metric"
+}
